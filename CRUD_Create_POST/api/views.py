@@ -6,8 +6,9 @@ from .models import Student
 from .serializers import StudentSerializer
 from rest_framework.renderers import JSONRenderer
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
-
+@csrf_exempt
 def student_api(request):
     if request.method == 'GET':
         json_data = request.body
