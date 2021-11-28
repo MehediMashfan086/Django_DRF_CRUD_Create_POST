@@ -1,3 +1,4 @@
+from functools import partial
 import json
 from django.shortcuts import render
 import io
@@ -32,6 +33,22 @@ def student_api(request):
         stream = io.BytesIO(json_data)
         python_data = JSONParser().parse(stream)
         serializer = StudentSerializer(data = python_data)
+        if serializer.is_valid():
+            serializer.save()
+            resp = {'msg': 'Data Created!'}
+            json_data = JSONRenderer().render(resp)
+            return HttpResponse(json_data, content_type = 'application/json')
+        
+        json_data = JSONRenderer().render(serializer.errors)
+        return HttpResponse(json_data, content_type = 'application/json')
+    
+    if request.method == 'PUT':
+        json_data = request.body
+        stream = io.BytesIO(json_data)
+        python_data = JSONParser().parse(stream)
+        id = python_data.get('id')
+        stu = Student.objects.get(id=id)
+        serializer = StudentSerializer(stu, data = python_data, partial=True)
         if serializer.is_valid():
             serializer.save()
             resp = {'msg': 'Data Created!'}
